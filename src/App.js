@@ -918,26 +918,38 @@ const DairyProcessorDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Habitat Coverage</h3>
             <div className="space-y-4">
-              {habitatData.map((habitat) => (
-                <div key={habitat.type} className="flex items-center gap-4">
-                  <div className={`p-2 bg-${habitat.color}-100 rounded-lg`}>
-                    <habitat.icon className={`w-5 h-5 text-${habitat.color}-600`} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">{habitat.type}</span>
-                      <span className="text-sm font-bold text-gray-900">{habitat.coverage}%</span>
+              {habitatData.map((habitat) => {
+                const bgColorClass = habitat.color === 'green' ? 'bg-green-100' : 
+                                   habitat.color === 'emerald' ? 'bg-emerald-100' :
+                                   habitat.color === 'blue' ? 'bg-blue-100' : 'bg-yellow-100';
+                const iconColorClass = habitat.color === 'green' ? 'text-green-600' : 
+                                     habitat.color === 'emerald' ? 'text-emerald-600' :
+                                     habitat.color === 'blue' ? 'text-blue-600' : 'text-yellow-600';
+                const barColorClass = habitat.color === 'green' ? 'bg-green-500' : 
+                                    habitat.color === 'emerald' ? 'bg-emerald-500' :
+                                    habitat.color === 'blue' ? 'bg-blue-500' : 'bg-yellow-500';
+                
+                return (
+                  <div key={habitat.type} className="flex items-center gap-4">
+                    <div className={`p-2 ${bgColorClass} rounded-lg`}>
+                      <habitat.icon className={`w-5 h-5 ${iconColorClass}`} />
                     </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full bg-${habitat.color}-500 transition-all duration-500`}
-                        style={{ width: `${(habitat.coverage / habitat.target) * 100}%` }}
-                      />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-700">{habitat.type}</span>
+                        <span className="text-sm font-bold text-gray-900">{habitat.coverage}%</span>
+                      </div>
+                      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${barColorClass} transition-all duration-500`}
+                          style={{ width: `${(habitat.coverage / habitat.target) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">Target: {habitat.target}%</div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Target: {habitat.target}%</div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <button className="w-full mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm">
               Update Habitat Mapping
