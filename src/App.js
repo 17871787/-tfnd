@@ -891,6 +891,213 @@ const DairyProcessorDashboard = () => {
     );
   };
 
+  // Biodiversity View
+  const BiodiversityView = () => {
+    const [selectedSpecies, setSelectedSpecies] = useState(null);
+    const [showSpeciesModal, setShowSpeciesModal] = useState(false);
+
+    const speciesData = [
+      { name: 'Turtle Dove', status: 'Critically Endangered', sightings: 3, trend: 'down' },
+      { name: 'Lapwing', status: 'Vulnerable', sightings: 12, trend: 'stable' },
+      { name: 'Yellowhammer', status: 'Vulnerable', sightings: 28, trend: 'up' },
+      { name: 'Skylark', status: 'Vulnerable', sightings: 45, trend: 'up' },
+      { name: 'Barn Owl', status: 'Least Concern', sightings: 67, trend: 'up' },
+      { name: 'Red Kite', status: 'Near Threatened', sightings: 8, trend: 'up' }
+    ];
+
+    const habitatData = [
+      { type: 'Woodland', coverage: 12, target: 15, icon: TreePine, color: 'green' },
+      { type: 'Hedgerows', coverage: 8, target: 10, icon: Leaf, color: 'emerald' },
+      { type: 'Wetlands', coverage: 3, target: 5, icon: Waves, color: 'blue' },
+      { type: 'Wildflower', coverage: 5, target: 8, icon: Sun, color: 'yellow' }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Habitat Coverage</h3>
+            <div className="space-y-4">
+              {habitatData.map((habitat) => (
+                <div key={habitat.type} className="flex items-center gap-4">
+                  <div className={`p-2 bg-${habitat.color}-100 rounded-lg`}>
+                    <habitat.icon className={`w-5 h-5 text-${habitat.color}-600`} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">{habitat.type}</span>
+                      <span className="text-sm font-bold text-gray-900">{habitat.coverage}%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-${habitat.color}-500 transition-all duration-500`}
+                        style={{ width: `${(habitat.coverage / habitat.target) * 100}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">Target: {habitat.target}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="w-full mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm">
+              Update Habitat Mapping
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Species Monitoring</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={[
+                { species: 'Birds', count: 47, target: 50 },
+                { species: 'Pollinators', count: 23, target: 30 },
+                { species: 'Mammals', count: 12, target: 15 },
+                { species: 'Amphibians', count: 8, target: 10 }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="species" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#10b981" />
+                <Bar dataKey="target" fill="#e5e7eb" />
+              </BarChart>
+            </ResponsiveContainer>
+            <button 
+              onClick={() => setShowSpeciesModal(true)}
+              className="w-full mt-4 px-4 py-2 border border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors text-sm"
+            >
+              Record Species Sighting
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Conservation Actions</h3>
+            <div className="space-y-3">
+              {[
+                { action: 'Bird boxes installed', count: 156, trend: 'up', impact: '+12 breeding pairs' },
+                { action: 'Wildlife corridors', count: 42, trend: 'up', impact: '8km connected' },
+                { action: 'Pond creation', count: 18, trend: 'stable', impact: '6 species returned' },
+                { action: 'Hedgerow planting', count: '12km', trend: 'up', impact: '+30% connectivity' }
+              ].map((action) => (
+                <div key={action.action} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">{action.action}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-gray-900">{action.count}</span>
+                      {action.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-600" />}
+                      {action.trend === 'stable' && <Minus className="w-4 h-4 text-gray-400" />}
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 mt-1">{action.impact}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Red List Species Monitoring */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Red List Species Monitoring</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium text-gray-800 mb-3">Species at Risk</h4>
+              <div className="space-y-2">
+                {speciesData.map((species) => (
+                  <div 
+                    key={species.name}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    onClick={() => setSelectedSpecies(species)}
+                  >
+                    <div>
+                      <div className="font-medium text-gray-800">{species.name}</div>
+                      <div className={`text-xs ${
+                        species.status === 'Critically Endangered' ? 'text-red-600' : 
+                        species.status === 'Vulnerable' ? 'text-orange-600' :
+                        species.status === 'Near Threatened' ? 'text-yellow-600' :
+                        'text-green-600'
+                      }`}>
+                        {species.status}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold">{species.sightings}</span>
+                      {species.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-600" />}
+                      {species.trend === 'down' && <ArrowDown className="w-4 h-4 text-red-600" />}
+                      {species.trend === 'stable' && <Minus className="w-4 h-4 text-gray-400" />}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-800 mb-3">Conservation Progress</h4>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={[
+                  { month: 'Jan', redList: 8, recovered: 2 },
+                  { month: 'Feb', redList: 7, recovered: 3 },
+                  { month: 'Mar', redList: 7, recovered: 4 },
+                  { month: 'Apr', redList: 6, recovered: 5 },
+                  { month: 'May', redList: 5, recovered: 6 },
+                  { month: 'Jun', redList: 4, recovered: 7 }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="redList" stroke="#ef4444" name="At Risk" strokeWidth={2} />
+                  <Line type="monotone" dataKey="recovered" stroke="#10b981" name="Recovered" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Biodiversity Intactness Map */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900">Biodiversity Intactness by Region</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-600">Filter:</span>
+              <select className="text-sm border border-gray-300 rounded-lg px-3 py-1">
+                <option>All Species</option>
+                <option>Red List Species</option>
+                <option>Pollinators</option>
+                <option>Farmland Birds</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {regionalData.map((region) => (
+              <div key={region.region} className="p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-medium text-gray-800 mb-2">{region.region}</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600">Intactness</span>
+                    <span className="text-sm font-bold">{(region.avgBiodiversity * 10).toFixed(0)}%</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-500 ${
+                        region.avgBiodiversity >= 7 ? 'bg-green-500' :
+                        region.avgBiodiversity >= 5 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                      }`}
+                      style={{ width: `${region.avgBiodiversity * 10}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {region.farms} farms monitored
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <FarmList />
+      </div>
+    );
+  };
+
   // TNFD Reporting View
   const TNFDReporting = () => {
     const [reportType, setReportType] = useState('summary');
@@ -1119,36 +1326,7 @@ const DairyProcessorDashboard = () => {
 
             {activeView === 'water' && <WaterView />}
 
-            {activeView === 'biodiversity' && (
-              <div className="space-y-6">
-                <div className="text-center py-20">
-                  <TreePine className="w-16 h-16 text-green-600 mx-auto mb-6" />
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Biodiversity Tracking</h2>
-                  <p className="text-xl text-gray-600 mb-8">
-                    Monitor species, habitats, and conservation efforts
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-green-600 mb-2">
-                        {aggregatedMetrics.avgMetrics.biodiversityIndex.toFixed(1)}
-                      </h3>
-                      <p className="text-gray-600">Biodiversity Index</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-emerald-600 mb-2">
-                        {aggregatedMetrics.avgMetrics.habitatCoverage.toFixed(0)}%
-                      </h3>
-                      <p className="text-gray-600">Habitat Coverage</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-blue-600 mb-2">147</h3>
-                      <p className="text-gray-600">Species Recorded</p>
-                    </div>
-                  </div>
-                </div>
-                <FarmList />
-              </div>
-            )}
+            {activeView === 'biodiversity' && <BiodiversityView />}
 
             {activeView === 'nutrients' && (
               <div className="space-y-6">
