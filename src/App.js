@@ -1110,6 +1110,284 @@ const DairyProcessorDashboard = () => {
     );
   };
 
+  // Nutrient Management View
+  const NutrientsView = () => {
+    const nutrientData = farms.map(farm => ({
+      ...farm,
+      nBalance: Math.floor(Math.random() * 60) - 10,
+      pBalance: Math.floor(Math.random() * 20) - 5,
+      manureN: Math.floor(Math.random() * 100) + 50,
+      fertiliserN: Math.floor(Math.random() * 80) + 20,
+      legumesN: Math.floor(Math.random() * 40) + 10
+    }));
+
+    return (
+      <div className="space-y-6">
+        {/* Nutrient Balance Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Nitrogen Balance</h3>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Activity className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {aggregatedMetrics.avgMetrics.nEfficiency.toFixed(0)}%
+                </div>
+                <div className="text-sm text-gray-600">Average Efficiency</div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Surplus farms</span>
+                  <span className="font-medium text-orange-600">
+                    {nutrientData.filter(f => f.nBalance > 30).length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Optimal range</span>
+                  <span className="font-medium text-green-600">
+                    {nutrientData.filter(f => f.nBalance >= 0 && f.nBalance <= 30).length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Deficit farms</span>
+                  <span className="font-medium text-red-600">
+                    {nutrientData.filter(f => f.nBalance < 0).length}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Phosphorus Balance</h3>
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Droplets className="w-5 h-5 text-orange-600" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {aggregatedMetrics.avgMetrics.pEfficiency.toFixed(0)}%
+                </div>
+                <div className="text-sm text-gray-600">Average Efficiency</div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">P Index 3+ farms</span>
+                  <span className="font-medium text-red-600">42</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">P Index 2 farms</span>
+                  <span className="font-medium text-green-600">186</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">P Index 0-1 farms</span>
+                  <span className="font-medium text-orange-600">42</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">NVZ Compliance</h3>
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Shield className="w-5 h-5 text-emerald-600" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-600">92%</div>
+                <div className="text-sm text-gray-600">Compliant Farms</div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">In NVZ areas</span>
+                  <span className="font-medium">156 farms</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Record keeping</span>
+                  <span className="font-medium text-green-600">98%</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Storage compliant</span>
+                  <span className="font-medium text-green-600">89%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nutrient Sources & Applications */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Nutrient Input Sources</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Synthetic Fertiliser', value: 35, fill: '#3b82f6' },
+                    { name: 'Farmyard Manure', value: 25, fill: '#10b981' },
+                    { name: 'Slurry', value: 20, fill: '#f59e0b' },
+                    { name: 'Legume Fixation', value: 15, fill: '#8b5cf6' },
+                    { name: 'Atmospheric', value: 5, fill: '#6b7280' }
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {[0, 1, 2, 3, 4].map((index) => (
+                    <Cell key={`cell-${index}`} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `${value}%`} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Application Timing</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={[
+                { month: 'Jan', applications: 5, optimal: 0 },
+                { month: 'Feb', applications: 12, optimal: 20 },
+                { month: 'Mar', applications: 45, optimal: 60 },
+                { month: 'Apr', applications: 78, optimal: 80 },
+                { month: 'May', applications: 65, optimal: 70 },
+                { month: 'Jun', applications: 42, optimal: 40 },
+                { month: 'Jul', applications: 28, optimal: 30 },
+                { month: 'Aug', applications: 35, optimal: 35 },
+                { month: 'Sep', applications: 22, optimal: 20 },
+                { month: 'Oct', applications: 8, optimal: 5 },
+                { month: 'Nov', applications: 3, optimal: 0 },
+                { month: 'Dec', applications: 2, optimal: 0 }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Area type="monotone" dataKey="optimal" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+                <Area type="monotone" dataKey="applications" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Slurry Storage & Management */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-gray-900">Slurry Storage & Treatment</h3>
+            <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+              <ClipboardCheck className="w-4 h-4" />
+              Create NMP
+            </button>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-800">Storage Capacity</h4>
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-gray-600">Average capacity</span>
+                    <span className="text-sm font-bold">5.2 months</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500" style={{ width: '87%' }} />
+                  </div>
+                </div>
+                <div className="text-sm space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">&lt;4 months</span>
+                    <span className="font-medium text-red-600">18 farms</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">4-6 months</span>
+                    <span className="font-medium text-green-600">198 farms</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">&gt;6 months</span>
+                    <span className="font-medium text-green-600">54 farms</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-800">Treatment Systems</h4>
+              <div className="space-y-2">
+                {[
+                  { type: 'Mechanical separation', count: 89, efficiency: '+15% N efficiency' },
+                  { type: 'Biological treatment', count: 34, efficiency: '+25% N efficiency' },
+                  { type: 'Acidification', count: 12, efficiency: '-30% emissions' },
+                  { type: 'Cover systems', count: 156, efficiency: '-20% emissions' }
+                ].map((system) => (
+                  <div key={system.type} className="p-2 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">{system.type}</span>
+                      <span className="text-sm font-medium">{system.count}</span>
+                    </div>
+                    <div className="text-xs text-green-600">{system.efficiency}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-800">Application Methods</h4>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={[
+                  { method: 'Injection', usage: 45 },
+                  { method: 'Band spread', usage: 78 },
+                  { method: 'Trailing shoe', usage: 62 },
+                  { method: 'Broadcast', usage: 85 }
+                ]} layout="vertical">
+                  <XAxis type="number" />
+                  <YAxis dataKey="method" type="category" width={80} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar dataKey="usage" fill="#10b981" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-800">Nutrient Recovery</h4>
+              <div className="space-y-3">
+                <div className="text-center p-4 bg-emerald-50 rounded-lg">
+                  <div className="text-2xl font-bold text-emerald-600">82%</div>
+                  <div className="text-sm text-emerald-700">Avg N Recovery</div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Timing optimized</span>
+                    <span className="font-medium text-green-600">186 farms</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Weather integrated</span>
+                    <span className="font-medium text-green-600">142 farms</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Soil testing</span>
+                    <span className="font-medium text-green-600">234 farms</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <FarmList />
+      </div>
+    );
+  };
+
   // TNFD Reporting View
   const TNFDReporting = () => {
     const [reportType, setReportType] = useState('summary');
@@ -1340,36 +1618,7 @@ const DairyProcessorDashboard = () => {
 
             {activeView === 'biodiversity' && <BiodiversityView />}
 
-            {activeView === 'nutrients' && (
-              <div className="space-y-6">
-                <div className="text-center py-20">
-                  <Activity className="w-16 h-16 text-amber-600 mx-auto mb-6" />
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Nutrient Management</h2>
-                  <p className="text-xl text-gray-600 mb-8">
-                    Monitor nitrogen and phosphorus efficiency across farms
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-amber-600 mb-2">
-                        {aggregatedMetrics.avgMetrics.nEfficiency.toFixed(0)}%
-                      </h3>
-                      <p className="text-gray-600">N Efficiency</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-orange-600 mb-2">
-                        {aggregatedMetrics.avgMetrics.pEfficiency.toFixed(0)}%
-                      </h3>
-                      <p className="text-gray-600">P Efficiency</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-green-600 mb-2">92%</h3>
-                      <p className="text-gray-600">NVZ Compliant</p>
-                    </div>
-                  </div>
-                </div>
-                <FarmList />
-              </div>
-            )}
+            {activeView === 'nutrients' && <NutrientsView />}
 
             {activeView === 'reporting' && <TNFDReporting />}
           </>
