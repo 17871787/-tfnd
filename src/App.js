@@ -601,6 +601,296 @@ const DairyProcessorDashboard = () => {
     );
   };
 
+  // Water Management View
+  const WaterView = () => {
+    const [activeWaterTab, setActiveWaterTab] = useState('audit');
+
+    const waterSourceData = [
+      { source: 'Mains Water', volume: 45000, cost: 1.85, trend: 'down' },
+      { source: 'Borehole', volume: 32000, cost: 0.45, trend: 'stable' },
+      { source: 'Rainwater Harvesting', volume: 18000, cost: 0.12, trend: 'up' },
+      { source: 'Recycled Water', volume: 12000, cost: 0.28, trend: 'up' }
+    ];
+
+    return (
+      <div className="space-y-6">
+        {/* Water Sub-Navigation */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100">
+          <div className="flex gap-1 p-1">
+            {['audit', 'quality', 'efficiency', 'risk'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveWaterTab(tab)}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium text-sm capitalize transition-all ${
+                  activeWaterTab === tab
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {tab === 'audit' && <ClipboardCheck className="w-4 h-4 inline mr-2" />}
+                {tab === 'quality' && <Droplets className="w-4 h-4 inline mr-2" />}
+                {tab === 'efficiency' && <TrendingUp className="w-4 h-4 inline mr-2" />}
+                {tab === 'risk' && <AlertTriangle className="w-4 h-4 inline mr-2" />}
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {activeWaterTab === 'audit' && (
+          <>
+            {/* Water Audit Overview */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Total Water Use</h3>
+                  <Droplets className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-2">
+                  {(aggregatedMetrics.totalMilkProduction * aggregatedMetrics.avgMetrics.waterUsage / 1000).toFixed(0)}
+                </div>
+                <div className="text-sm text-gray-600 mb-4">m³ per year</div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Per litre milk</span>
+                    <span className="font-medium">{aggregatedMetrics.avgMetrics.waterUsage.toFixed(0)} m³/1000L</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">YoY change</span>
+                    <span className="font-medium text-green-600">-8.2%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Water Sources</h3>
+                  <Map className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="space-y-3">
+                  {waterSourceData.map((source) => (
+                    <div key={source.source} className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-gray-800">{source.source}</div>
+                        <div className="text-xs text-gray-500">£{source.cost}/m³</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold">{(source.volume / 1000).toFixed(0)}k m³</div>
+                        <div className="flex items-center gap-1">
+                          {source.trend === 'up' && <TrendingUp className="w-3 h-3 text-green-600" />}
+                          {source.trend === 'down' && <ArrowDown className="w-3 h-3 text-red-600" />}
+                          {source.trend === 'stable' && <Minus className="w-3 h-3 text-gray-400" />}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Storage & Recycling</h3>
+                  <Database className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-600">Total Storage Capacity</span>
+                      <span className="text-sm font-bold">82.5M litres</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500" style={{ width: '68%' }} />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">68% utilization</div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-600">Recycling Rate</span>
+                      <span className="text-sm font-bold">{aggregatedMetrics.avgMetrics.waterRecycling.toFixed(0)}%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500" style={{ width: `${aggregatedMetrics.avgMetrics.waterRecycling}%` }} />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">Target: 40%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Water Usage by Process */}
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">Water Usage by Process</h3>
+                <button className="text-sm text-blue-600 hover:text-blue-800">View Details →</button>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Parlour Washing', value: 35, fill: '#3b82f6' },
+                        { name: 'Livestock Drinking', value: 30, fill: '#10b981' },
+                        { name: 'Yard Cleaning', value: 20, fill: '#f59e0b' },
+                        { name: 'Milk Cooling', value: 10, fill: '#8b5cf6' },
+                        { name: 'Other', value: 5, fill: '#6b7280' }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {[0, 1, 2, 3, 4].map((index) => (
+                        <Cell key={`cell-${index}`} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `${value}%`} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-800">Efficiency Opportunities</h4>
+                  <div className="space-y-3">
+                    {[
+                      { process: 'Parlour Washing', saving: '15-20%', action: 'Recycle final rinse' },
+                      { process: 'Yard Cleaning', saving: '25-30%', action: 'Rainwater harvesting' },
+                      { process: 'Milk Cooling', saving: '10-15%', action: 'Plate cooler upgrade' }
+                    ].map((opp) => (
+                      <div key={opp.process} className="p-3 bg-blue-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-800">{opp.process}</span>
+                          <span className="text-sm font-bold text-blue-600">{opp.saving}</span>
+                        </div>
+                        <div className="text-xs text-gray-600">{opp.action}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeWaterTab === 'quality' && (
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Water Quality Parameters</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { param: 'Nitrate (NO₃)', value: 12.5, limit: 50, unit: 'mg/L' },
+                { param: 'Phosphate (PO₄)', value: 0.8, limit: 2, unit: 'mg/L' },
+                { param: 'BOD', value: 18, limit: 30, unit: 'mg/L' },
+                { param: 'Suspended Solids', value: 25, limit: 60, unit: 'mg/L' }
+              ].map((param) => (
+                <div key={param.param} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">{param.param}</span>
+                    <span className={`text-sm font-bold ${param.value < param.limit ? 'text-green-600' : 'text-red-600'}`}>
+                      {param.value} {param.unit}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-500 ${param.value < param.limit ? 'bg-green-500' : 'bg-red-500'}`}
+                      style={{ width: `${(param.value / param.limit) * 100}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-500">Limit: {param.limit} {param.unit}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeWaterTab === 'efficiency' && (
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Water Efficiency Initiatives</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              {[
+                { initiative: 'Rainwater Harvesting', adoption: 156, avgSaving: '18%', roi: '2.3 years' },
+                { initiative: 'Plate Coolers', adoption: 198, avgSaving: '12%', roi: '1.8 years' },
+                { initiative: 'Variable Speed Pumps', adoption: 87, avgSaving: '8%', roi: '3.1 years' },
+                { initiative: 'Smart Meters', adoption: 234, avgSaving: '15%', roi: '0.9 years' }
+              ].map((init) => (
+                <div key={init.initiative} className="p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium text-gray-800 mb-3">{init.initiative}</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Adopted by</span>
+                      <span className="font-bold text-gray-900">{init.adoption} farms</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Avg saving</span>
+                      <span className="font-bold text-green-600">{init.avgSaving}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">ROI</span>
+                      <span className="font-bold text-blue-600">{init.roi}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeWaterTab === 'risk' && (
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Water Risk Assessment</h3>
+            <div className="space-y-4">
+              {regionalData.map((region) => {
+                const regionFarms = farms.filter(f => f.region === region.region);
+                const avgDroughtRisk = regionFarms.reduce((sum, f) => sum + f.riskScores.drought, 0) / regionFarms.length;
+                const avgFloodRisk = regionFarms.reduce((sum, f) => sum + f.riskScores.flood, 0) / regionFarms.length;
+                
+                return (
+                  <div key={region.region} className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-800 mb-3">{region.region}</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm text-gray-600 mb-1">Drought Risk</div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full transition-all duration-500 ${
+                                avgDroughtRisk < 2 ? 'bg-green-500' :
+                                avgDroughtRisk < 3.5 ? 'bg-yellow-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${(avgDroughtRisk / 5) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-bold">{avgDroughtRisk.toFixed(1)}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600 mb-1">Flood Risk</div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full transition-all duration-500 ${
+                                avgFloodRisk < 2 ? 'bg-green-500' :
+                                avgFloodRisk < 3.5 ? 'bg-yellow-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${(avgFloodRisk / 5) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-bold">{avgFloodRisk.toFixed(1)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <FarmList />
+      </div>
+    );
+  };
+
   // TNFD Reporting View
   const TNFDReporting = () => {
     const [reportType, setReportType] = useState('summary');
@@ -827,36 +1117,7 @@ const DairyProcessorDashboard = () => {
               </div>
             )}
 
-            {activeView === 'water' && (
-              <div className="space-y-6">
-                <div className="text-center py-20">
-                  <Droplets className="w-16 h-16 text-blue-600 mx-auto mb-6" />
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Water Management</h2>
-                  <p className="text-xl text-gray-600 mb-8">
-                    Monitor water usage, quality, and conservation across all farms
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-blue-600 mb-2">
-                        {aggregatedMetrics.avgMetrics.waterUsage.toFixed(0)}
-                      </h3>
-                      <p className="text-gray-600">Average m³/1000L</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-green-600 mb-2">
-                        {aggregatedMetrics.avgMetrics.waterRecycling.toFixed(0)}%
-                      </h3>
-                      <p className="text-gray-600">Recycling Rate</p>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-2xl font-bold text-emerald-600 mb-2">270</h3>
-                      <p className="text-gray-600">Monitored Farms</p>
-                    </div>
-                  </div>
-                </div>
-                <FarmList />
-              </div>
-            )}
+            {activeView === 'water' && <WaterView />}
 
             {activeView === 'biodiversity' && (
               <div className="space-y-6">
